@@ -184,6 +184,17 @@ app.post(`/update-a-db-record`, (req, res) => {
     }) ;
 });
 
+app.post('/update-a-db-record', (req, res) => {
+  const { name, password } = req.body;
+  db.collection(dbCollection).updateOne(
+    { name },
+    { $set: { password } }
+  ).then((result) => {
+    console.log(`Updated "${name}". matched:${result.matchedCount}, modified:${result.modifiedCount}`);
+    res.redirect('/read-a-db-record');
+  }).catch(console.error);
+});
+
 /*
  * This router handles GET requests to
  * http://localhost:3000/delete-a-db-record/
@@ -211,4 +222,13 @@ app.post(`/delete-a-db-record`, (req, res) => {
                 }
             });
         });
+});
+
+app.post('/delete-a-db-record', (req, res) => {
+  const { name } = req.body;
+  db.collection(dbCollection).deleteOne({ name })
+    .then((result) => {
+      console.log(`Deleted "${name}". deleted:${result.deletedCount}`);
+      res.redirect('/read-a-db-record');
+    }).catch(console.error);
 });
