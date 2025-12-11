@@ -161,6 +161,29 @@ app.get(`/update-a-db-record`, (req, res) => {
     });
 });
 
+app.post(`/update-a-db-record`, (req, res) => {
+    let nameFromForm = req.body.name;
+
+    console.log(nameFromForm); // For example, cianna
+    console.log(req.body);     // For example, { name: 'cianna', password: 'asdf' }
+
+    db.collection(dbCollection).updateOne(
+        { name: nameFromForm },
+        { $set: {"password": req.body.password} }
+    ).then(() => {
+        db.collection(dbCollection).find().toArray((err, arrayObject) => {
+            if (err) {
+                return console.log(err);
+            } else {
+                console.log(
+                    `Updated one record into Mongo via an HTML form using POST.\n`);
+
+                res.render(`read-from-database.njk`, {mongoDBArray: arrayObject});
+            }
+        });
+    }) ;
+});
+
 /*
  * This router handles GET requests to
  * http://localhost:3000/delete-a-db-record/
@@ -170,4 +193,22 @@ app.get(`/delete-a-db-record`, (req, res) => {
         res.render(`delete-a-record-in-database.njk`,
             {mongoDBArray: arrayObject});
     });
+});
+
+app.post(`/delete-a-db-record`, (req, res) => {
+    let nameFromForm = req.body.name;
+
+    db.collection(dbCollection).deleteOne({ name: nameFromForm })
+        .then(() => {
+            db.collection(dbCollection).find().toArray((err, arrayObject) => {
+                if (err) {
+                    return console.log(err);
+                } else {
+                    console.log(`User requested the resource ` +
+                        colors.green, `http://${HOST}:${port}/delete-a-db-record`, colors.reset);
+
+                    res.render(`read-from-database.njk`, {mongoDBArray: arrayObject});
+                }
+            });
+        });
 });
