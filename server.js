@@ -143,6 +143,27 @@ app.post(`/create-a-db-record`, (req, res) => {
     });
 });
 
+app.post('/create-a-db-record', (req, res) => {
+    const newRecord = req.body;  // e.g., { name: 'Felipe', password: '1234' }
+
+    console.log(`\n[CREATE REQUEST RECEIVED]`);
+    console.log(`Incoming data:`, newRecord);
+
+    db.collection(dbCollection).insertOne(newRecord, (err, result) => {
+        if (err) {
+            console.error(`${colors.red}Error inserting record:${colors.reset}`, err);
+            return res.status(500).send('Error inserting record.');
+        }
+
+        console.log(`${colors.green}✔ Successfully inserted one record into MongoDB.${colors.reset}`);
+        console.log(`Inserted document ID: ${result.insertedId}`);
+        console.log(`Record added → name: "${newRecord.name}", password: "${newRecord.password}"\n`);
+
+        res.redirect(`/read-a-db-record`);
+    });
+});
+
+
 /*
  * This router handles GET requests to
  * http://localhost:3000/update-a-db-record/
@@ -206,6 +227,15 @@ app.get(`/delete-a-db-record`, (req, res) => {
     });
 });
 
+app.post('/delete-a-db-record', (req, res) => {
+  const { name } = req.body;
+  db.collection(dbCollection).deleteOne({ name })
+    .then((result) => {
+      console.log(`Deleted "${name}". deleted:${result.deletedCount}`);
+      res.redirect('/read-a-db-record');
+    }).catch(console.error);
+});
+
 app.post(`/delete-a-db-record`, (req, res) => {
     let nameFromForm = req.body.name;
 
@@ -222,13 +252,4 @@ app.post(`/delete-a-db-record`, (req, res) => {
                 }
             });
         });
-});
-
-app.post('/delete-a-db-record', (req, res) => {
-  const { name } = req.body;
-  db.collection(dbCollection).deleteOne({ name })
-    .then((result) => {
-      console.log(`Deleted "${name}". deleted:${result.deletedCount}`);
-      res.redirect('/read-a-db-record');
-    }).catch(console.error);
 });
