@@ -185,8 +185,8 @@ app.get(`/update-a-db-record`, (req, res) => {
 app.post(`/update-a-db-record`, (req, res) => {
     let nameFromForm = req.body.name;
 
-    console.log(nameFromForm); // For example, cianna
-    console.log(req.body);     // For example, { name: 'cianna', password: 'asdf' }
+    console.log(nameFromForm);
+    console.log(req.body);
 
     db.collection(dbCollection).updateOne(
         { name: nameFromForm },
